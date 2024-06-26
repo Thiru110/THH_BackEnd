@@ -37,6 +37,7 @@ global_result ={}
 keywords_result = [...]
 df = pd.DataFrame(columns=['Name', 'Link', 'Query'])
 file_name = "result"
+final_job_id=None
 
 connection = sql.connect(
         user="root",
@@ -303,6 +304,7 @@ def scrape_and_get_links():
 @app.route('/fetch-using-api', methods=['GET'])
 async def final_con():
     global api_rank
+    global final_job_id
     text = request.args.get('text')
     data = request.args.get('results')
     data = data.replace("'", '"')
@@ -312,6 +314,7 @@ async def final_con():
     results = json.loads(data)
     print(results)
 
+    final_job_id=job_id
     try:
         final_api_rank = await main(results, job_id)
         api_rank = pd.DataFrame(final_api_rank)
@@ -325,12 +328,14 @@ async def final_con():
 def rank():
     global api_rank
     global result_df
+    global final_job_id
     data = request.args
     job_description = data.get('text') 
     print(result_df['JOB_ID'])
     rank_resumes(api_rank, result_df, job_description)
    
-    return jsonify({"status":"Your resumes have been fetched click dashboard to view your resumes"}),200 
+    return jsonify({"status":"Success","message":f"Your resumes have been fetched. Click {final_job_id} in the dashboard to view your resumes"}),200 
+
 
 
 @app.route('/fetch_candidates', methods=['POST'])
@@ -402,6 +407,7 @@ def Relevant():
 def search():
     global df
     global file_name  # Accessing the global variable df
+    le_jdid=None
     data = request.json
     user_input = data.get('user_input')
     num_results = 300  # Default to 300 results
@@ -437,11 +443,14 @@ def search():
                 df = pd.concat(df_list, ignore_index=True)
                 print(df)
                 #save_to_database(name, link, user_input,user_email,timestamp)
-                save_to_database(df, user_email)
+                le_jdid= save_to_database(df, user_email,boolean_query)
             else:
                 return jsonify({"message": "No results fetched, please modify your prompt",}), 406
 
-    return jsonify({"message": "Search completed what else would you like to do \nA: Fetching resumes\nB: Document validation\nC: Link extraction\nD:NLP", "results": df.to_dict(orient='records')}), 200
+    if le_jdid is not None:
+        return jsonify({"message": f"Search completed. Please check {le_jdid} in the dashboard to view the results. \nWhat else would you like to do: \nA: Fetching resumes\nB: Document validation\nC: Link extraction\nD:NLP", "results": df.to_dict(orient='records')}), 200
+    else:
+        return jsonify({"message": "Search completed, but no results have been found. Please optimize your query. \nWhat else would you like to do: \nA: Fetching resumes\nB: Document validation\nC: Link extraction\nD:NLP", "results": df.to_dict(orient='records')}), 200
 
 @app.route('/download_links', methods=['GET'])
 def download_links():

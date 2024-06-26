@@ -122,7 +122,7 @@ def rank_text(resume, job_description):
    
     percentage = util.pytorch_cos_sim(resume_embedding, job_description_embedding)
    
-    return float(percentage[0][0].round(decimals=2))
+    return float((percentage[0][0]*100).round(decimals=2))
  
 def rank_resumes(df1,df2,job_description):   
     final_data = pd.concat([df1, df2], ignore_index=True)

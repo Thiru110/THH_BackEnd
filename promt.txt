@@ -100,10 +100,9 @@ Relevant Experience = 19.37% ]
 
 
 Demo Answer :
-Based on the provided resume, here are the requested details:
 Relevant Experience = 19.37%
-must_have Experience = 55%
-Good_to_have Experience= 22.5%
+Must have Experience = 55%
+Good to have Experience= 22.5%
 
 
 

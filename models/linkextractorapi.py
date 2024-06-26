@@ -109,7 +109,7 @@ def search_google(query, num_results, api_keys):
             continue
     return {"error": "All API keys failed"}
 
-def save_to_database(df, user_email):
+def save_to_database(df, user_email,boolean_query):
 # def save_to_database(name, link, user_query,user_email,timestamp):
     global new_jdid
 
@@ -135,10 +135,11 @@ def save_to_database(df, user_email):
         new_jdid=f'Job id_LE:{jdid}'
     print(new_jdid)
     for index, row in df.iterrows():
-        sql_query = "INSERT INTO link_extractor (job_id, name, link, jd, Event_Timestamp, email) VALUES (%s, %s, %s, %s, %s,%s)"
-        sql_values = (new_jdid, row['Name'], row['Link'], row['Query'], row['Timestamp'], row['Email'])
+        sql_query = "INSERT INTO link_extractor (job_id, name, link, jd, Event_Timestamp, email,Booleanquery) VALUES (%s, %s, %s, %s, %s,%s,%s)"
+        sql_values = (new_jdid, row['Name'], row['Link'], row['Query'], row['Timestamp'], row['Email'], boolean_query)
         cursor.execute(sql_query, sql_values)
     db.commit()
+    return new_jdid
 
 # @app.route('/download-csv', methods=['GET'])
 # def download_csv():

@@ -46,6 +46,7 @@ def create_tables_if_not_exist(cursor):
         id INT NOT NULL AUTO_INCREMENT,
         job_id INT DEFAULT NULL,
         jd TEXT,
+        Booleanquery TEXT,
         email VARCHAR(255) DEFAULT NULL,
         name VARCHAR(255) DEFAULT NULL,
         link VARCHAR(512) DEFAULT NULL,
