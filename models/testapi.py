@@ -22,12 +22,13 @@ def fetch_resume_profile_api(kwords):
 
     skillset_to_post={
     "countries": ["US"],
-    "resumeCount": 15,
+    "resumeCount": 50,
     "skills": kwords_list,
-    "states": ["CA"],
+    "states": ["CA","TX","NJ"],
     "withinMiles": 0,
     "zipCode": ""
     }
+    #"states":["AK", "AL", "AR", "AS", "AZ", "CA", "CO", "CT", "DC", "DE", "FL", "GA", "GU", "HI", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA", "MD", "ME", "MH", "MI", "MN", "MO", "MP", "MS", "MT", "NC", "ND", "NE", "NH", "NJ", "NM", "NV", "NY", "OH", "OK", "OR", "PA", "PR", "RI", "SC", "SD", "TN", "TX", "UT", "VA", "VI", "VT", "WA", "WI", "WV", "WY", "AK", "AL", "AR", "AS", "AZ", "CA", "CO", "CT", "DC", "DE", "FL", "GA", "GU", "HI", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA", "MD", "ME", "MH", "MI", "MN", "MO", "MP", "MS", "MT", "NC", "ND", "NE", "NH", "NJ", "NM", "NV", "NY", "OH", "OK", "OR", "PA", "PR", "RI", "SC", "SD", "TN", "TX", "UT", "VA", "VI", "VT", "WA", "WI", "WV", "WY", "AK", "AL", "AR", "AS", "AZ", "CA", "CO", "CT", "DC", "DE", "FL", "GA", "GU", "HI", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA", "MD", "ME", "MH", "MI", "MN", "MO", "MP", "MS", "MT", "NC", "ND", "NE", "NH", "NJ", "NM", "NV", "NY", "OH", "OK", "OR", "PA", "PR", "RI", "SC", "SD", "TN", "TX", "UT", "VA", "VI", "VT", "WA", "WI", "WV", "WY"]
 
     fetch_cand_prof_url="https://api.jobdiva.com/apiv2/jobdiva/TalentSearch"
     headers = access_tokens()
@@ -124,10 +125,19 @@ def rank_text(resume, job_description):
    
     return float((percentage[0][0]*100).round(decimals=2))
  
-def rank_resumes(df1,df2,job_description):   
-    final_data = pd.concat([df1, df2], ignore_index=True)
+# def rank_resumes(df1,df2,job_description):   
+#     final_data = pd.concat([df1, df2], ignore_index=True)
+#     final_data['Similarity'] = ''
+#     final_data['Similarity'] = final_data.apply(lambda row: rank_text(row['Resume'], job_description), axis=1)
+#     sql_data_push(final_data)
+#     return final_data
+
+def rank_resumes(df1,job_description):  
+    # final_data = pd.concat([df1], ignore_index=True)
+    final_data=df1
+    print("FINAL_DATAAAAAAAAAAA", final_data)
     final_data['Similarity'] = ''
     final_data['Similarity'] = final_data.apply(lambda row: rank_text(row['Resume'], job_description), axis=1)
     sql_data_push(final_data)
+    print(final_data)
     return final_data
-

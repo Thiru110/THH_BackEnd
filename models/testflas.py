@@ -35,10 +35,10 @@ def get_user_role_and_jobs(email,table):
                 cursor.execute("SELECT email, GROUP_CONCAT(DISTINCT job_id ORDER BY job_id SEPARATOR '\n') AS job_ids FROM validation GROUP BY email")
                 job_details = cursor.fetchall()
                 #cursor.execute(f"SELECT distinct(email),job_id FROM validation;")    
-            elif table == "link_Extractor":
-                cursor.execute("SELECT email, GROUP_CONCAT(DISTINCT job_id ORDER BY job_id SEPARATOR '\n') AS job_ids FROM link_Extractor GROUP BY email")
+            elif table == "link_extractor":
+                cursor.execute("SELECT email, GROUP_CONCAT(DISTINCT job_id ORDER BY job_id SEPARATOR '\n') AS job_ids FROM link_extractor GROUP BY email")
                 job_details = cursor.fetchall()
-                #cursor.execute(f"SELECT distinct(email),job_id,jd FROM link_Extractor;") - jd has not been included in the above query
+                #cursor.execute(f"SELECT distinct(email),job_id,jd FROM link_extractor;") - jd has not been included in the above query
 
         else:
             # If the user is not an admin, retrieve job details for the given email
@@ -50,10 +50,10 @@ def get_user_role_and_jobs(email,table):
                 cursor.execute("SELECT email, GROUP_CONCAT(DISTINCT job_id ORDER BY job_id SEPARATOR '\n') AS job_ids FROM validation WHERE email = %s", (email,))
                 job_details = cursor.fetchall()
                 #cursor.execute("SELECT job_id FROM validation WHERE email = %s", (email,)) 
-            elif table == "link_Extractor":
-                cursor.execute("SELECT email, GROUP_CONCAT(DISTINCT job_id ORDER BY job_id SEPARATOR '\n') AS job_ids FROM link_Extractor WHERE email = %s", (email,))
+            elif table == "link_extractor":
+                cursor.execute("SELECT email, GROUP_CONCAT(DISTINCT job_id ORDER BY job_id SEPARATOR '\n') AS job_ids FROM link_extractor WHERE email = %s", (email,))
                 job_details = cursor.fetchall()
-                #cursor.execute("SELECT job_id,jd FROM link_Extractor WHERE email = %s", (email,)) - jd has not been included in the above query        
+                #cursor.execute("SELECT job_id,jd FROM link_extractor WHERE email = %s", (email,)) - jd has not been included in the above query        
             
 
         # job_details = cursor.fetchall()

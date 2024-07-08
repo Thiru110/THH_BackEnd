@@ -73,17 +73,52 @@ class UserInfo(db.Model):
         return f'<UserInfo {self.username}>'
     
     # !     JWT TOKEN GENERATE FUNCTION
+# def generate_token(user):
+#     token = jwt.encode({
+#         'user_id': user.id,
+#         'username': user.username,
+#         'email': user.email,
+#         'role': user.Role,  # Include user's role
+#         'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+#     }, app.config['SECRET_KEY'], algorithm='HS256')
+#     return token
 def generate_token(user):
-    token = jwt.encode({
+    payload = {
         'user_id': user.id,
         'username': user.username,
         'email': user.email,
-        'role': user.Role,  # Include user's role
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
-    }, app.config['SECRET_KEY'], algorithm='HS256')
-    return token
+        'role': user.Role,
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+    }
+    token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
+    return token  # Directly return the token as string
+
+
 # *             USER SIGNUP API
 
+# @app.route('/user/signup', methods=['POST'])
+# def signup():
+#     data = request.json
+#     username = data.get('username')
+#     email = data.get('email')
+#     password = data.get('password')
+    
+#     if not username or not email or not password:
+#         return jsonify({"error": "Missing username, email, or password"}), 400
+    
+#     if UserInfo.query.filter_by(username=username).first() is not None:
+#         return jsonify({"error": "Username already exists"}), 409
+    
+#     # Hash the password before storing it
+#     hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+    
+#     new_user = UserInfo(username=username, email=email, password=hashed_password,Role='user')
+#     db.session.add(new_user)
+#     db.session.commit()
+#     # !     TOKEN GENERATE
+#     token = generate_token(new_user)
+
+#     return jsonify({"message": "Success", "token": token}), 200
 @app.route('/user/signup', methods=['POST'])
 def signup():
     data = request.json
@@ -97,17 +132,38 @@ def signup():
     if UserInfo.query.filter_by(username=username).first() is not None:
         return jsonify({"error": "Username already exists"}), 409
     
-    # Hash the password before storing it
-    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+    if UserInfo.query.filter_by(email=email).first() is not None:
+        return jsonify({"error": "Email already exists"}), 409
+
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).strip().decode('utf-8')
     
-    new_user = UserInfo(username=username, email=email, password=hashed_password,Role='user')
+    new_user = UserInfo(username=username, email=email, password=hashed_password, Role='user')
     db.session.add(new_user)
     db.session.commit()
-    # !     TOKEN GENERATE
-    token = generate_token(new_user)
 
+    token = generate_token(new_user)
     return jsonify({"message": "Success", "token": token}), 200
 
+# !correct one
+# @app.route('/user/signin', methods=['POST'])
+# def signin():
+#     data = request.json
+#     username = data.get('username')
+#     password = data.get('password')
+    
+#     if not username or not password:
+#         return jsonify({"status": "Failure", "message": "Missing username or password"}), 400
+    
+#     user = UserInfo.query.filter_by(username=username).first()
+#     if not user:
+#         return jsonify({"status": "Failure", "message": "User not found"}), 404
+    
+#     if bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
+#         token = generate_token(user)
+#         return jsonify({"status": "Success", "message": "Sign in successful", "token": token}), 200
+#     else:
+#         return jsonify({"status": "Failure", "message": "Invalid password"}), 401
+    
 @app.route('/user/signin', methods=['POST'])
 def signin():
     data = request.json
@@ -126,7 +182,8 @@ def signin():
         return jsonify({"status": "Success", "message": "Sign in successful", "token": token}), 200
     else:
         return jsonify({"status": "Failure", "message": "Invalid password"}), 401
-    
+
+
 @app.route('/user/changepass', methods=['POST'])
 def forgot_password():
     data = request.json
@@ -150,13 +207,39 @@ def forgot_password():
     
     return jsonify({"message": "Password updated successfully"}), 200
 
+# !correct one
+# @app.route('/user/auth', methods=['GET'])
+# def auth():
+#     auth_header = request.headers.get('Authorization')
+#     if auth_header:
+#         token = auth_header.split(" ")[1]
+#         try:
+#             decoded = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+#             return jsonify({"status": "Success", "data": decoded}), 200
+#         except jwt.ExpiredSignatureError:
+#             return jsonify({"status": "Failure", "message": "Token expired"}), 401
+#         except jwt.InvalidTokenError:
+#             return jsonify({"status": "Failure", "message": "Invalid token"}), 401
+#     else:
+#         return jsonify({"status": "Failure", "message": "Token is missing"}), 401
+    
+# logging.basicConfig(level=logging.DEBUG)
+
+# try:
+#     with open(r'D:\THH\THH_File\Backend\conversation_tree.json', 'r') as file:
+#         conversation_tree = json.load(file)
+# except Exception as e:
+#     logging.error(f"Error loading conversation_tree.json: {e}")
+#     conversation_tree = {}
+
+# current_node = "start"
 
 @app.route('/user/auth', methods=['GET'])
 def auth():
     auth_header = request.headers.get('Authorization')
     if auth_header:
-        token = auth_header.split(" ")[1]
         try:
+            token = auth_header.split(" ")[1]
             decoded = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
             return jsonify({"status": "Success", "data": decoded}), 200
         except jwt.ExpiredSignatureError:
@@ -165,18 +248,59 @@ def auth():
             return jsonify({"status": "Failure", "message": "Invalid token"}), 401
     else:
         return jsonify({"status": "Failure", "message": "Token is missing"}), 401
+
+# Logging setup
+# logging.basicConfig(level=logging.DEBUG)
+
+# try:
+#     with open(r'D:\THH\THH_File\Backend\conversation_tree.json', 'r') as file:
+#         conversation_tree = json.load(file)
+# except Exception as e:
+#     logging.error(f"Error loading conversation_tree.json: {e}")
+#     conversation_tree = {}
+
+# current_node = "start"
+
+
+# @app.route('/response', methods=['POST'])
+# def get_response():
+#     global current_node
+#     try:
+#         response_text = request.json.get('message')
+#         if not response_text:
+#             raise ValueError("No response message provided")
+
+#         logging.debug(f"Received message: {response_text}")
+
+#         if current_node in conversation_tree:
+#             options = conversation_tree[current_node][1]
+#             if response_text.lower() in options:
+#                 next_node = options[response_text.lower()]
+#                 if next_node is not None:
+#                     if next_node == "start":
+#                         current_node = "start"
+#                     elif next_node in ["e", "f"]:
+#                         current_node = next_node
+#                     else:
+#                         current_node = next_node
+#                     next_message = conversation_tree[current_node][0]
+#                 else:
+#                     current_node = "start"
+#                     next_message = "Your Folder Have been Successfully Uploaded Wait for Sometime While We Scrap The Finest Candidates...."
+#             elif current_node == "NLP":
+#                 next_message = chat_with_sql(response_text)
+#             else:
+#                 next_message = "Invalid response to continue \n A: Fetch Resume \n B: Document Validation \n C: Link Extraction \n D: NLP"
+#         else:
+#             next_message = "Invalid conversation node."
+
+#         logging.debug(f"Next message: {next_message}")
+#         return jsonify({'message': next_message})
     
-logging.basicConfig(level=logging.DEBUG)
-
-try:
-    with open(r'D:\THH\THH_File\Backend\conversation_tree.json', 'r') as file:
-        conversation_tree = json.load(file)
-except Exception as e:
-    logging.error(f"Error loading conversation_tree.json: {e}")
-    conversation_tree = {}
-
-current_node = "start"
-
+#     except Exception as e:
+#         logging.error(f"Error processing response: {e}")
+#         return jsonify({"status":"Failiure",'message': str(e)}), 500
+    
 @app.route('/response', methods=['POST'])
 def get_response():
     global current_node
@@ -214,8 +338,19 @@ def get_response():
     
     except Exception as e:
         logging.error(f"Error processing response: {e}")
-        return jsonify({"status":"Failiure",'message': str(e)}), 500
-    
+        return jsonify({"status": "Failure", 'message': str(e)}), 500
+
+# Logging setup
+logging.basicConfig(level=logging.DEBUG)
+
+try:
+    with open(r'D:\THH\THH_File\Backend\conversation_tree.json', 'r') as file:
+        conversation_tree = json.load(file)
+except Exception as e:
+    logging.error(f"Error loading conversation_tree.json: {e}")
+    conversation_tree = {}
+
+current_node = "start"
 @app.route('/get-job-details', methods=['GET'])
 def get_job_details():
     email = request.args.get('email')
@@ -231,7 +366,7 @@ def get_job_details():
 @app.route('/get-link-details', methods=['GET'])
 def get_link_details():
     email = request.args.get('email')    
-    table='link_Extractor'
+    table='link_extractor'
     if not email:
         return jsonify({"status":"Failure","message": "Email parameter is missing"}),400
     
@@ -246,7 +381,7 @@ def get_validation_details():
         return jsonify({"status":"Failure","message": "Email parameter is missing"}),400
     
     return get_user_role_and_jobs(email,table)
-
+    # !   ----new ------
 @app.route('/extract_keywords', methods=['POST'])
 def extract_keywords():
     email = request.form.get('email')
@@ -255,15 +390,15 @@ def extract_keywords():
     print(file, text, email)
  
     if not email:
-        return jsonify({'status': 'Failiure', 'message': 'No email provided'}), 400
+        return jsonify({'status': 'Failure', 'message': 'No email provided'}), 400
  
     if text and not file:
         results, job_id,text = extract_keywords_and_save(text, nlp, email, is_file=False)
         print(results)
-        return redirect(url_for('scrape_and_get_links', results=results, job_id=str(job_id),text=str(text)))
+        return redirect(url_for('final_con', results=results, job_id=str(job_id),text=str(text)))
     elif file:
         if file.filename == '':
-            return jsonify({'status': 'Failiure', 'message': 'No selected file'}), 400
+            return jsonify({'status': 'Failure', 'message': 'No selected file'}), 400
  
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
             file.save(temp_file.name)
@@ -274,33 +409,16 @@ def extract_keywords():
         print("1111111111111",results)
         print(type(results))
         # scrape_postjob = postjob_scrap(results)
-        return redirect(url_for('scrape_and_get_links', results=results, job_id=str(job_id),text=str(text)))#, scrape_postjob=scrape_postjob
+        #return redirect(url_for('scrape_and_get_links', results=results, job_id=str(job_id),text=str(text)))#, scrape_postjob=scrape_postjob
+        return redirect(url_for('final_con', results=results, job_id=str(job_id),text=str(text)))
     else:
-        return jsonify({'status': 'Failiure', 'message': 'No text or file provided'}), 400
-
+        return jsonify({'status': 'Failure', 'message': 'No text or file provided'}), 400
+ 
 async def main(keyword,jd_id):
     data = await con_data(keyword,jd_id)
     return data
    
-@app.route('/web-scrap', methods=['GET'])
-def scrape_and_get_links():
-    global result_df  # Declare the global variable
-    try:
-        text = request.args.get('text')
-        job_id = request.args.get('job_id')
-        result = request.args.get('results')
-        results = json.loads(result)
  
-        result_df = scrape_and_process_resumes(results)
- 
-        # Add the job_id to the DataFrame
-        result_df['JOB_ID'] = job_id
- 
-        # Redirect to fetch-using-api with result and job_id
-        return redirect(url_for('final_con', results=results, job_id=str(job_id), text=str(text)))
-    except Exception as e:
-        return jsonify({"status": "Error", "message": str(e)}), 500
-
 @app.route('/fetch-using-api', methods=['GET'])
 async def final_con():
     global api_rank
@@ -313,8 +431,9 @@ async def final_con():
     print('66666',job_id)
     results = json.loads(data)
     print(results)
-
+   
     final_job_id=job_id
+ 
     try:
         final_api_rank = await main(results, job_id)
         api_rank = pd.DataFrame(final_api_rank)
@@ -323,18 +442,107 @@ async def final_con():
  
     except Exception as e:
         return jsonify({"status": "Error", "message": str(e)}), 500
-
+ 
 @app.route('/Ranking', methods=['GET'])
 def rank():
     global api_rank
     global result_df
     global final_job_id
     data = request.args
-    job_description = data.get('text') 
-    print(result_df['JOB_ID'])
-    rank_resumes(api_rank, result_df, job_description)
+    job_description = data.get('text')
+    #print(result_df['JOB_ID'])
+    #rank_resumes(api_rank, result_df, job_description)
+    rank_resumes(api_rank, job_description)
+    return jsonify({"status": "Success", "message":f"Your resumes have been fetched. Click {final_job_id} in the dashboard to view your resumes"}),200
+ 
+# @app.route('/extract_keywords', methods=['POST'])
+# def extract_keywords():
+#     email = request.form.get('email')
+#     text = request.form.get('text')
+#     file = request.files.get('file')
+#     print(file, text, email)
+ 
+#     if not email:
+#         return jsonify({'status': 'Failiure', 'message': 'No email provided'}), 400
+ 
+#     if text and not file:
+#         results, job_id,text = extract_keywords_and_save(text, nlp, email, is_file=False)
+#         print(results)
+#         return redirect(url_for('scrape_and_get_links', results=results, job_id=str(job_id),text=str(text)))
+#     elif file:
+#         if file.filename == '':
+#             return jsonify({'status': 'Failiure', 'message': 'No selected file'}), 400
+ 
+#         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+#             file.save(temp_file.name)
+#             temp_path = temp_file.name
+ 
+#         results, job_id,text = extract_keywords_and_save(temp_path, nlp, email)
+#         os.remove(temp_path)
+#         print("1111111111111",results)
+#         print(type(results))
+#         # scrape_postjob = postjob_scrap(results)
+#         return redirect(url_for('scrape_and_get_links', results=results, job_id=str(job_id),text=str(text)))#, scrape_postjob=scrape_postjob
+#     else:
+#         return jsonify({'status': 'Failiure', 'message': 'No text or file provided'}), 400
+
+# async def main(keyword,jd_id):
+#     data = await con_data(keyword,jd_id)
+#     return data
    
-    return jsonify({"status":"Success","message":f"Your resumes have been fetched. Click {final_job_id} in the dashboard to view your resumes"}),200 
+# @app.route('/web-scrap', methods=['GET'])
+# def scrape_and_get_links():
+#     global result_df  # Declare the global variable
+#     try:
+#         text = request.args.get('text')
+#         job_id = request.args.get('job_id')
+#         result = request.args.get('results')
+#         results = json.loads(result)
+ 
+#         result_df = scrape_and_process_resumes(results)
+ 
+#         # Add the job_id to the DataFrame
+#         result_df['JOB_ID'] = job_id
+ 
+#         # Redirect to fetch-using-api with result and job_id
+#         return redirect(url_for('final_con', results=results, job_id=str(job_id), text=str(text)))
+#     except Exception as e:
+#         return jsonify({"status": "Error", "message": str(e)}), 500
+
+# @app.route('/fetch-using-api', methods=['GET'])
+# async def final_con():
+#     global api_rank
+#     global final_job_id
+#     text = request.args.get('text')
+#     data = request.args.get('results')
+#     data = data.replace("'", '"')
+#     print(data)
+#     job_id = request.args.get('job_id')
+#     print('66666',job_id)
+#     results = json.loads(data)
+#     print(results)
+
+#     final_job_id=job_id
+#     try:
+#         final_api_rank = await main(results, job_id)
+#         api_rank = pd.DataFrame(final_api_rank)
+ 
+#         return redirect(url_for('rank',text=text))
+ 
+#     except Exception as e:
+#         return jsonify({"status": "Error", "message": str(e)}), 500
+
+# @app.route('/Ranking', methods=['GET'])
+# def rank():
+#     global api_rank
+#     global result_df
+#     global final_job_id
+#     data = request.args
+#     job_description = data.get('text') 
+#     print(result_df['JOB_ID'])
+#     rank_resumes(api_rank, result_df, job_description)
+   
+#     return jsonify({"status":"Success","message":f"Your resumes have been fetched. Click {final_job_id} in the dashboard to view your resumes"}),200 
 
 
 
