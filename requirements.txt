@@ -45,9 +45,9 @@ Jinja2==3.1.4
 joblib==1.4.2
 jsonpatch==1.33
 jsonpointer==2.4
-langchain==0.2.1
-langchain-community==0.2.1
-langchain-core==0.2.1
+langchain
+langchain-community
+langchain-core
 langchain-google-genai
 langchain-text-splitters==0.2.0
 langcodes==3.4.0
