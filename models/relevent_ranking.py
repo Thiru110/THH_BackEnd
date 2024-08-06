@@ -5,7 +5,7 @@ def db_retrieve(ID, Name):
     try:
         mydb = mysql.connector.connect(
             # host="192.168.0.195",
-            host="localhost",
+            host="146.148.69.66",
             user="root",
             database="Antony",
             password="root123",
