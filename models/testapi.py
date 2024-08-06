@@ -3,7 +3,7 @@ import pandas as pd
 from sentence_transformers import SentenceTransformer, util
 from models.sql import sql_data_push    
 def access_tokens():
-    with open(r"refresh_tokens.txt","r") as token:
+    with open(r"/app/refresh_tokens.txt","r") as token:
         token=token.read()
     access_token = token
     headers = { "Authorization": f"Bearer {access_token}" }
