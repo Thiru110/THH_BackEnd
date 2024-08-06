@@ -4,8 +4,8 @@ services:
   db:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: shan20
-      MYSQL_DATABASE: antony
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: Antony
     ports:
       - "4000:3306" # MySQL typically runs on port 3306
     volumes:
@@ -14,14 +14,14 @@ services:
   web:
     build: .
     ports:
-      - "4000:4000"
+      - "8082:8082"
     depends_on:
       - db
     environment:
       FLASK_ENV: development
-      DATABASE_URL: mysql+pymysql://root20:shan20@172.24.186.65:3306/antony # Use the service name 'db'
+      DATABASE_URL: mysql+pymysql://root123:root@localhost:3306/Antony # Use the service name 'db'
     volumes:
-      - ./D:/docker/THH_BackEnd/model-best:/app/model-best # Adjust this path to your host model directory
+      - ./model-best # Adjust this path to your host model directory
 
 volumes:
   db_data:
