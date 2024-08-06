@@ -41,7 +41,7 @@ final_job_id=None
 
 connection = sql.connect(
         user="root",
-        host="localhost",
+        host="146.148.69.66",
         database="Antony",
         password="root123",
         port="3306",
@@ -49,7 +49,7 @@ connection = sql.connect(
     )
 cursor = connection.cursor()
 create_tables_if_not_exist(cursor)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root123@localhost:3306/antony'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root123@146.148.69.66:3306/antony'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'tucEDtE44BbQLv7tXCivZkn1DbmKGsYb'
 
