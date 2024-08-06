@@ -9,7 +9,7 @@ services:
       FLASK_ENV: development
       DATABASE_URL: mysql+pymysql://root:root123@146.148.69.66:3306/antony
     volumes:
-      - ./THH_BackEnd/model-best # Adjusted to match your local directory structure
+      - ./model-best:/app/model-bestt # Adjusted to match your local directory structure
 
 volumes:
   db_data:
