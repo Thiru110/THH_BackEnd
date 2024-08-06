@@ -7,7 +7,7 @@ def db_retrieve(ID, Name):
             # host="192.168.0.195",
             host="146.148.69.66",
             user="root",
-            database="Antony",
+            database="antony",
             password="root123",
             port="3306",
             auth_plugin='mysql_native_password'
