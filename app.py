@@ -54,7 +54,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'tucEDtE44BbQLv7tXCivZkn1DbmKGsYb'
 
  
-nlp = spacy.load("/app/model-best")
+nlp = spacy.load(r"/app/model-best")
  
 result_df=None
 api_rank=None
