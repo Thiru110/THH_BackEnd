@@ -5,7 +5,7 @@ services:
     image: mysql:8.0
     environment:
       MYSQL_ROOT_PASSWORD: root123
-      MYSQL_DATABASE: Antony
+      MYSQL_DATABASE: antony
     ports:
       - "4000:3306" # MySQL typically runs on port 3306
     volumes:
@@ -19,7 +19,7 @@ services:
       - db
     environment:
       FLASK_ENV: development
-      DATABASE_URL: mysql+pymysql://root123:root@localhost:3306/Antony # Use the service name 'db'
+      DATABASE_URL: mysql+pymysql://root:root123@localhost:3306/Antony # Use the service name 'db'
     volumes:
       - ./model-best # Adjust this path to your host model directory
 
