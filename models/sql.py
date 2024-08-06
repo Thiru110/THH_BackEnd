@@ -9,7 +9,7 @@ def job_detail(jd, key, email):
     mydb = mysql.connector.connect(
         host="146.148.69.66",
         user="root",
-        database="Antony",
+        database="antony",
         password="root123",
         port="3306",
         auth_plugin='mysql_native_password'
@@ -41,7 +41,7 @@ def sql_data_push(df):
     connection = mysql.connector.connect(
         user="root",
         host="146.148.69.66",
-        database="Antony",
+        database="antony",
         password="root123",
         port="3306",
         auth_plugin='mysql_native_password'
