@@ -19,7 +19,7 @@ services:
       - db
     environment:
       FLASK_ENV: development
-      DATABASE_URL: mysql+pymysql://root:root123@http://146.148.69.66/:3306/Antony # Use the service name 'db'
+      DATABASE_URL: mysql+pymysql://root:root123@146.148.69.66:3306/Antony # Use the service name 'db'
     volumes:
       - ./model-best # Adjust this path to your host model directory
 
